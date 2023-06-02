@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+    <!-- applicant -->
+        <!-- Định nghĩa một form view cho model hr.applicant -->
+        <record id="crm_case_form_view_job" model="ir.ui.view">
+            <field name="name">applicant.form.custom</field>
+            <field name="model">hr.applicant</field>
+            <field name="inherit_id" ref="hr_recruitment.crm_case_form_view_job"/>
+            <field name="arch" type="xml">
+                            <field name="name"/>
+                           <xpath expr="//field[@name='email_from']" position="after">
+                                 <field name="custom_field"/>
+                           </xpath>
+                      
+            </field>
+        </record>
+<!-- # degree -->
+     <record id="hr_recruitment_degree_form" model="ir.ui.view">
+            <field name="name">degree.form.custom</field>
+            <field name="model">hr.recruitment.degree</field>
+            <field name="inherit_id" ref="hr_recruitment.hr_recruitment_degree_form"/>
+            <field name="arch" type="xml">
+                    <!-- Thay đổi hoặc thêm các trường trong form view -->
+            
+                  <xpath expr="//field[@name='name']" position="after">
+                        <field name="Degree_type"/>
+                  </xpath>
+            </field>
+        </record>
+    <record id="hr_recruitment_degree_tree" model="ir.ui.view">
+            <field name="name">degree.tree.custom</field>
+            <field name="model">hr.recruitment.degree</field>
+            <field name="inherit_id" ref="hr_recruitment.hr_recruitment_degree_tree"/>
+            <field name="arch" type="xml">
+                    <!-- Thay đổi hoặc thêm các trường trong form view -->
+            
+                  <xpath expr="//field[@name='name']" position="after">
+                        <field name="Degree_type"/>
+                  </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
