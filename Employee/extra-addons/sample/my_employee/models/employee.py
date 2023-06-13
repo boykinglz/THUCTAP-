@@ -62,7 +62,7 @@ class EmployeeReport(models.Model):
     ], 'Trình độ')
     study_field = fields.Char('Chuyên ngành')
     department_id = fields.Many2one('hr.department', 'Bộ phận')
-    ssnid = fields.Char('Số sổ BHXH')
+    diagnosis = fields.Char('Số sổ BHXH')
     notes = fields.Text('Ghi chú')
 
     def get_employee_data(self):
@@ -75,7 +75,7 @@ class EmployeeReport(models.Model):
                 'certificate': employee.certificate,
                 'study_field': employee.study_field,
                 'department_id': employee.department_id.name,
-                'ssnid': employee.ssnid,
+                'diagnosis': employee.diagnosis,
                 'notes': employee.notes,
             })
         return employee_data
