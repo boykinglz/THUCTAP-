@@ -1,0 +1,6 @@
+*.pyc
+*.~lock
+**/node_modules
+**/yarn.lock
+**/yarn.log
+**/__pycache__
