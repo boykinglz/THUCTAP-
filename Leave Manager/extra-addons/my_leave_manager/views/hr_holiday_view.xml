@@ -43,61 +43,101 @@
     <!-- Định nghĩa template cho báo cáo -->
     <template id="hr_leave_report_mypdf">
         <main>
-            <t t-call="web.external_layout">
-                <div class="header">
-                    <!-- Định dạng và hiển thị logo -->
-                    <div class="logo">
-                        <img src="/my_leave_manager/static/img/logo.png" alt="Logo" />
-                    </div>
-                    <!-- Hiển thị tiêu đề -->
-                    <div class="title">
-                        <h1>Thống Kê Đăng Ký Nghỉ Phép</h1>
-                    </div>
+            <div class="header">
+                <!-- Định dạng và hiển thị logo -->
+                <div class="logo">
+                    <img src="/my_leave_manager/static/img/logo.png"
+                        style="width: 100px; height: auto;" alt="Logo" />
                 </div>
-                <div class="content">
-                    <!-- Hiển thị bảng dữ liệu -->
-                    <table class="table table-condensed">
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Mã NV</th>
-                                <th>Nhân Viên</th>
-                                <th>Chức Vụ</th>
-                                <th>Phòng Ban</th>
-                                <th>Diễn giải</th>
-                                <th>Số Ngày</th>
-                                <th>Ngày Bắt Đầu</th>
-                                <th>Ngày Kết Thúc</th>
-                                <th>Loại Nghỉ Phép</th>
-                                <th>Trạng Thái</th>
-                            </tr>
-                        </thead>
-                        <!-- <tbody>
-                    <t t-foreach="docs" t-as="doc">
+                <!-- Hiển thị tiêu đề -->
+                <div class="title" style="text-align: center;font-family: Arial, Helvetica, sans-serif;">
+                    <h1>Thống Kê Đăng Ký Nghỉ Phép</h1>
+                </div>
+            </div>
+            <div class="content">
+                <!-- Hiển thị bảng dữ liệu -->
+                <table id="customers">
+                    <thead>
                         <tr>
-                            <td><t t-esc="doc.sequence_number"/></td>
-                            <td><t t-esc="doc.employee_code"/></td>
-                            <td><t t-esc="doc.employee_name"/></td>
-                            <td><t t-esc="doc.job_title"/></td>
-                            <td><t t-esc="doc.department"/></td>
-                            <td><t t-esc="doc.description"/></td>
-                            <td><t t-esc="doc.number_of_days"/></td>
-                            <td><t t-esc="doc.start_date"/></td>
-                            <td><t t-esc="doc.end_date"/></td>
-                            <td><t t-esc="doc.leave_type"/></td>
-                            <td><t t-esc="doc.status"/></td>
+                            <th>STT</th>
+                            <th>Nhân Viên</th>
+                            <th>Phòng Ban</th>
+                            <th>Diễn giải</th>
+                            <th>Số Ngày</th>
+                            <th>Ngày Bắt Đầu</th>
+                            <th>Ngày Kết Thúc</th>
+                            <th>Loại Nghỉ Phép</th>
+                            <th>Trạng Thái</th>
                         </tr>
-                    </t>
-                </tbody> -->
-                    </table>
-                </div>
-            </t>
+                    </thead>
+                    <tbody>
+                        <t t-set="counter" t-value="1" />
+                        <t t-foreach="docs" t-as="doc">
+                            <tr>
+                                <td>
+                                    <t t-esc="counter" />
+                                </td>
+                                <td>
+                                    <t t-esc="doc.employee_id.name" />
+                                </td>
+                                <td>
+                                    <t t-esc="doc.employee_id.department_id.name" />
+                                </td>
+                                <td>
+                                    <t t-esc="doc.name" />
+                                </td>
+                                <td>
+                                    <t t-esc="doc.duration_display" />
+                                </td>
+                                <td>
+                                    <t t-esc="doc.date_from" />
+                                </td>
+                                <td>
+                                    <t t-esc="doc.date_to" />
+                                </td>
+                                <td>
+                                    <t t-esc="doc.holiday_status_id.name" />
+                                </td>
+                                <td>
+                                    <t t-esc="doc.state" />
+                                </td>
+                                <t t-set="counter" t-value="counter + 1" />
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+
+            <style>
+                #customers {
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                }
+
+                #customers td, #customers th {
+                border: 1px solid #ddd;
+                padding: 8px;
+                }
+
+                #customers tr:nth-child(even){background-color: #f2f2f2;}
+
+                #customers tr:hover {background-color: #ddd;}
+
+                #customers th {
+                padding-top: 12px;
+                padding-bottom: 12px;
+                text-align: left;
+                background-color: #04AA6D;
+                color: white;
+                }
+            </style>
         </main>
 
     </template>
 
 
-    <record id="action_report_mypdf" model="ir.actions.act_window">
+    <!-- <record id="action_report_mypdf" model="ir.actions.act_window">
         <field name="name">My PDF Report</field>
         <field name="type">ir.actions.act_url</field>
         <field name="res_model">hr.leave</field>
@@ -106,7 +146,7 @@
         <field name="groups"
             eval="[(6, 0, [ref('hr_holidays.group_hr_holidays_manager'),
     ref('hr_holidays.group_hr_holidays_user')])]" />
-    </record>
+    </record> -->
 
 
     <menuitem
@@ -114,7 +154,7 @@
         name="Reporting"
         parent="hr_holidays.menu_hr_holidays_root"
         sequence="99"
-        action="action_report_mypdf"
+        action="hr_holidays.hr_leave_action_all"
         groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user" />
 
 </odoo>
