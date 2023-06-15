@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_payslip_view_tree_inherit" model="ir.ui.view">
+        <field name="name">hr.payslip.view.tree.inherit</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_tree"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='date_to']" position="after">
+                <field name="currency_id" invisible="1"/>
+                <field name="basic_wage" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="net_wage" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Inherit Form View to Modify it -->
+    <record id="hr_payslip_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.payslip.view.form.inherit</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//button[@name='compute_sheet']" position="after">
+                <button name="action_payslip_sent" string="Send" type="object" class="oe_highlight"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
