@@ -16,7 +16,6 @@
         </field>
     </record>
 
-    <!-- Inherit Form View to Modify it -->
     <record id="hr_payslip_view_form_inherit" model="ir.ui.view">
         <field name="name">hr.payslip.view.form.inherit</field>
         <field name="model">hr.payslip</field>

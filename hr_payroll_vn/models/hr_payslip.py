@@ -1,21 +1,15 @@
 # -*- coding:utf-8 -*-
 
 from odoo import api, fields, models, tools, _
-from odoo.tools.misc import format_date
 
 
 class HrPayslip(models.Model):
-    _inherit = 'hr.payslip'
+    _name = 'hr.payslip'
+    _inherit = ['hr.payslip', 'mail.thread']
 
+    currency_id = fields.Many2one(related='contract_id.currency_id')
     basic_wage = fields.Monetary(compute='_compute_basic_net')
     net_wage = fields.Monetary(compute='_compute_basic_net')
-    currency_id = fields.Many2one(related='contract_id.currency_id')
-    dates = fields.Char(compute='_compute_dates')
-    sent = fields.Boolean(readonly=True, default=False, copy=False,
-                          help="It indicates that the payslip has been sent.")
-    user_id = fields.Many2one('res.users', string='Human Resources Manager', track_visibility='onchange',
-                              readonly=True, states={'draft': [('readonly', False)]},
-                              default=lambda self: self.env.user, copy=False)
 
     def _compute_basic_net(self):
         for payslip in self:
@@ -26,55 +20,54 @@ class HrPayslip(models.Model):
         lines = self.line_ids.filtered(lambda line: line.code == code)
         return sum([line.total for line in lines])
 
-    @api.depends('date_from')
-    def _compute_dates(self):
-        for slip in self.filtered(lambda p: p.date_from):
-            lang = slip.employee_id.sudo().address_home_id.lang or self.env.user.lang
-            context = {'lang': lang}
-            del context
-
-            slip.dates = '%(dates)s' % {
-                'dates': format_date(self.env, slip.date_from, date_format="MMMM y", lang_code=lang)
-            }
-
     @api.multi
     def action_payslip_sent(self):
         self.ensure_one()
         template = self.env.ref('hr_payroll_vn.email_template_edi_payslip', False)
-        compose_form = self.env.ref('hr_payroll_vn.hr_payslip_send_wizard_form', False)
-        lang = self.env.context.get('lang')
-        if template and template.lang:
-            lang = template._render_template(template.lang, 'hr.payslip', self.id)
-        self = self.with_context(lang=lang)
-        STATE = {
-            'draft': _('Draft Payslip'),
-            'verify': _('Draft Payslip'),
-            'done': _('Payslip'),
-            'cancel': _('Payslip'),
-        }
+        compose_form = self.env.ref('mail.email_compose_message_wizard_form', False)
         ctx = dict(
             default_model='hr.payslip',
             default_res_id=self.id,
             default_use_template=bool(template),
             default_template_id=template and template.id or False,
             default_composition_mode='comment',
-            mark_invoice_as_sent=True,
-            model_description=STATE[self.state],
-            custom_layout="mail.mail_notification_paynow",
-            force_email=True
+            mark_so_as_sent=True
         )
         return {
             'name': _('Send Payslip'),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'hr.payslip.send',
+            'res_model': 'mail.compose.message',
             'views': [(compose_form.id, 'form')],
             'view_id': compose_form.id,
             'target': 'new',
             'context': ctx,
         }
 
-
-class HrPayslipRun(models.Model):
-    _inherit = 'hr.payslip.run'
+    @api.one
+    def force_payslip_sent(self):
+        composer_obj = self.env['mail.compose.message']
+        email_act = self.action_payslip_sent()
+        if email_act and email_act.get('context'):
+            composer_values = {}
+            email_ctx = email_act['context']
+            composer_values.update(composer_obj.onchange_template_id(
+                template_id=email_ctx.get('default_template_id'),
+                composition_mode=email_ctx.get('default_composition_mode'),
+                model=email_ctx.get('default_model'),
+                res_id=email_ctx.get('default_res_id')
+            )['value'])
+            if not composer_values.get('email_from'):
+                composer_values['email_from'] = self.company_id.email
+            composer_obj = composer_obj.with_context(
+                default_model=email_ctx.get('default_model'),
+                default_res_id=email_ctx.get('default_res_id'),
+                default_use_template=email_ctx.get('default_use_template'),
+                default_template_id=email_ctx.get('default_template_id'),
+                default_composition_mode=email_ctx.get('default_composition_mode'),
+                mark_so_as_sent=email_ctx.get('mark_so_as_sent')
+            )
+            composer = composer_obj.create(composer_values)
+            composer.send_mail()
+        return True
