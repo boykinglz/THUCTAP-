@@ -14,7 +14,7 @@
             </field>
         </record>
 
-        <record model="ir.ui.view" id="hr_contract_benefit_form_view">
+        <!-- <record model="ir.ui.view" id="hr_contract_benefit_form_view">
             <field name="name">hr.contract.benefit.form</field>
             <field name="model">hr.contract</field>
             <field name="arch" type="xml">
@@ -28,6 +28,7 @@
                     </sheet>
                 </form>
             </field>
-        </record>
+        </record> -->
+
     </data>
 </odoo>
