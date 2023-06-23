@@ -74,7 +74,7 @@
                                     <td><span t-esc="doc.certificate"/></td>
                                     <td><span t-esc="doc.study_field"/></td>
                                     <td><span t-esc="doc.department_id.name"/></td>
-                                    <td><span t-esc="doc.bhxh"/></td>
+                                    <td><span t-esc="doc.medical_record_ids.bhxh"/></td>
                                     <td><span t-esc="doc.additional_note"/></td>
                                 </tr>
                             </tbody>
@@ -95,8 +95,8 @@
         attachment_use="True"
     />
 
-    <menuitem id="menu_employee_report" name="Báo cáo nhân viên" parent="hr.menu_hr_root" sequence="20"/>
-    <menuitem id="menu_employee_report_list" name="Danh sách báo cáo nhân viên" parent="menu_employee_report" action="employee_report_action" sequence="10"/>
+    <!-- <menuitem id="menu_employee_report" name="Báo cáo nhân viên" parent="hr.menu_hr_root" sequence="20"/>
+    <menuitem id="menu_employee_report_list" name="Danh sách báo cáo nhân viên" parent="menu_employee_report" action="employee_report_action" sequence="10"/> -->
 
     <record id="report_employee_list" model="ir.actions.report">
         <field name="name">Employee List</field>
@@ -104,7 +104,11 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">my_employee.report_employee_list</field>
         <field name="file">my_employee.report_employee_list</field>
-        
+        <field name="model">hr.employee,date_start</field>
+
+        <field name="name">hr.contract.tree</field>
+            <field name="model">hr.contract</field>
+
         <field name="print_report_name">"Danh sách nhân viên"</field>
         <field name="report_rml">my_employee.report_employee_list</field>
         <field name="attachment_use">True</field>
@@ -133,7 +137,6 @@
                                 <td><span t-esc="o.department_id.name"/></td>
                                 <td><span t-esc="o.job_title"/></td>
                                 <td><span t-esc="o.date_start"/></td>
-                                <span class="text-muted">(If fixed-term contract)</span>
                             </tr>
                         </tbody>
                     </table>
@@ -142,6 +145,7 @@
             </t>
         </t>
     </template>
+
 
     <report
         id="report_employee_list"

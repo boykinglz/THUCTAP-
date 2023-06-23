@@ -33,7 +33,7 @@ class MedicalRecord(models.Model):
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
-
+   
     relationship_ids = fields.One2many('hr.relationship', 'employee_id', string='Relationships', groups="hr.group_hr_user")
     medical_record_ids = fields.One2many('medical.record', 'employee_id', string='Medical Records', groups="hr.group_hr_user")
     labor_contract = fields.Binary(string='Labor Contract', groups="hr.group_hr_user")
@@ -43,7 +43,8 @@ class HrEmployee(models.Model):
     salary_adjustment = fields.Binary(string='Salary Adjustment', groups="hr.group_hr_user")
     salary_adjustment_filename = fields.Char(string='Salary Adjustment Filename', groups="hr.group_hr_user")
     bhxh = fields.Char(string='BHXH')
-    date_start  = fields.Many2one('hr.Contract','Ngày bắt đầu làm việc')
+    # date_start = fields.Date('Start Date', help="Start date of the contract.")
+    date_start = fields.Date('Ngày bắt đầu làm việc')
 
     # Override the existing view to add the relationship and medical record sections
     def _get_formview_id(self, access_uid=None):
@@ -67,7 +68,7 @@ class EmployeeReport(models.Model):
     diagnosis = fields.Char('Số sổ BHXH')
     bhxh = fields.Char('BHXH')
     job_title = fields.Char('Chức Vụ')
-    date_start  = fields.Many2one('hr.Contract','Ngày bắt đầu làm việc')
+    date_start  = fields.Date('hr.Contract','Ngày bắt đầu làm việc')
 
     def get_employee_data(self):
         employees = self.env['hr.employee'].search([])
@@ -82,8 +83,9 @@ class EmployeeReport(models.Model):
                 'diagnosis': employee.diagnosis,
                 'notes': employee.notes,
                 'job_title': employee.job_title.name,
-                'date_start': employee.date_start.name,
-                'BHXH': employee.BHXH,
+                # 'date_start': employee.date_start.name,
+                'date_start': employee.contract_id.date_start,
+                'BHXH': employee.BHXH.name,
             })
         return employee_data
     
